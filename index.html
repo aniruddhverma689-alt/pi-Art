@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pi Sequence Circle</title>
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="c"></canvas>
+    <script>
+        const canvas = document.getElementById("c");
+        const ctx = canvas.getContext("2d");
+        function resize() { canvas.width = innerWidth; canvas.height = innerHeight; }
+        resize(); window.addEventListener("resize", resize);
+
+        const CENTER = { x: canvas.width / 2, y: canvas.height / 2 };
+        const RADIUS = Math.min(canvas.width, canvas.height) * 0.45;
+        const POINTS = 1000;
+
+        // first 1000 digits of Pi after decimal
+        const piDigits = "3141592653589793238462643383279502884197169399375105820974944592" +
+            "3078164062862089986280348253421170679821480865132823066470938446" +
+            "0955058223172535940812848111745028410270193852110555964462294895";
+        const digits = piDigits.split('').map(Number);
+
+        const dots = [];
+        for (let i = 0; i < POINTS; i++) {
+            const angle = (Math.PI * 2 / POINTS) * i - Math.PI / 2;
+            dots.push({ x: CENTER.x + Math.cos(angle) * RADIUS, y: CENTER.y + Math.sin(angle) * RADIUS });
+        }
+
+        let step = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.fillStyle = 'rgba(0,0,0,0.02)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            const linesPerFrame = 5;
+            for (let i = 0; i < linesPerFrame; i++) {
+                const idx = step % POINTS;
+                const target = digits[idx % digits.length] % POINTS;
+                const p1 = dots[idx];
+                const p2 = dots[target];
+                ctx.strokeStyle = `hsla(${(step * 0.5) % 360},60%,70%,0.5)`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(p1.x, p1.y);
+                ctx.lineTo(p2.x, p2.y);
+                ctx.stroke();
+                step++;
+            }
+        }
+        animate();
+    </script>
+</body>
+
+</html>
